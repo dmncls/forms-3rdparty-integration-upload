@@ -1,0 +1,42 @@
+diff --git a/forms-3rdparty-integration.php b/forms-3rdparty-integration.php
+index 15dc9f4..ef3ef52 100644
+--- a/forms-3rdparty-integration.php
++++ b/forms-3rdparty-integration.php
+@@ -493,6 +493,7 @@ class Forms3rdPartyIntegration {
+ 					)
+ 				, $service
+ 				, $form
++				, $submission
+ 			);
+ 
+ 			//remote call
+diff --git a/plugins/contactform7.php b/plugins/contactform7.php
+index 68b00cf..4f42c88 100644
+--- a/plugins/contactform7.php
++++ b/plugins/contactform7.php
+@@ -77,7 +77,10 @@ class Forms3rdpartyIntegration_CF7 extends Forms3rdpartyIntegration_FPLUGIN {
+ 	 */
+ 	protected function GET_FORM_SUBMISSION($form) {
+ 		$submission = WPCF7_Submission::get_instance();
+-		if($submission) return $submission->get_posted_data();
++		if($submission) {
++		    return $submission->get_posted_data() 
++				+ array('FILES'=>$submission->uploaded_files());
++        }
+ 		return array('no submission');
+ 	}
+ 
+diff --git a/plugins/gravityforms.php b/plugins/gravityforms.php
+index 9343d87..6a1e64c 100644
+--- a/plugins/gravityforms.php
++++ b/plugins/gravityforms.php
+@@ -74,7 +74,8 @@ class Forms3rdpartyIntegration_Gf extends Forms3rdpartyIntegration_FPLUGIN {
+ 	 * Get the posted data from the form (or POST, wherever it is)
+ 	 */
+ 	protected function GET_FORM_SUBMISSION($form) {
+-		return stripslashes_deep($_POST); // fix issue #42
++		return stripslashes_deep($_POST) // fix issue #42 
++		  + array('FILES'=>$_FILES); 
+ 	}
+ 
+ 	/**
