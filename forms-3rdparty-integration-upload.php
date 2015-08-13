@@ -10,6 +10,7 @@
 */
 
 include_once plugin_dir_path(__FILE__).'/../forms-3rdparty-integration/forms-3rdparty-integration.php';
+define('MIME_TYPES_URL','http://svn.apache.org/repos/asf/httpd/httpd/trunk/docs/conf/mime.types');
 
 add_filter( 'Forms3rdPartyIntegration_init', 'f3iup_init' );
 
@@ -39,21 +40,26 @@ function f3iup_check_for_file_uploads( $post, $service, $form, $submission ) {
 
     // check if we have any files to upload
     foreach ( $post['body'] as $field => $value ) {
+        
         if ( 0 === strpos($field,$upload_field_prefix) ) {
 
             $filename = $submission['FILES'][$third2form[$field]];
-            $field = substr( $field, strlen($upload_field_prefix));
+            $field_trimmed = substr( $field, strlen($upload_field_prefix));
 
             if (is_file($filename)) {
                 $payload .= '--' . $boundary;
                 $payload .= "\r\n";
-                $payload .= 'Content-Disposition: form-data; name="' . $field . '"; filename="' . basename( $value ) . '"' . "\r\n";
-                $payload .= 'Content-Type: ' . get_mime_type($value, 'C:\\xampp\\apache\\conf') . "\r\n";
+                $payload .= 'Content-Disposition: form-data; name="' . $field_trimmed . '"; filename="' . basename( $value ) . '"' . "\r\n";
+                $mime = get_mime_type($value);
+                if ($mime) {
+                    $payload .= 'Content-Type: ' . $mime . "\r\n";
+                }
                 $payload .= "\r\n";
                 $payload .= file_get_contents( $filename );
                 $payload .= "\r\n";
-                continue;
             }
+            
+            $value = basename( $value );
         }
 
         // for non-file fields or file fields with missing file
@@ -70,25 +76,9 @@ function f3iup_check_for_file_uploads( $post, $service, $form, $submission ) {
     return $post;
 }
 
-
-function get_mime_type( $filename, $mimePath = '../etc' ) {
-    $fileext = substr( strrchr( $filename, '.' ), 1 );
-    if ( empty( $fileext ) )
-        return (false);
-    $regex = "/^([\w\+\-\.\/]+)\s+(\w+\s)*($fileext\s)/i";
-    $lines = file( "$mimePath/mime.types" );
-    foreach ( $lines as $line ) {
-        if ( substr( $line, 0, 1 ) == '#' )
-            continue;
-        // skip comments
-        $line = rtrim( $line ) . " ";
-        if ( !preg_match( $regex, $line, $matches ) )
-            continue;
-        // no match to the extension
-        return ($matches[1]);
-    }
-    return (false);
-    // no match at all
+function get_mime_type( $filename ) {
+    $finfo = new finfo(FILEINFO_MIME);
+    return $finfo->filename($filename);
 }
 
     
