@@ -57,9 +57,13 @@ function f3iup_check_for_file_uploads( $post, $service, $form, $submission ) {
                 $payload .= "\r\n";
                 $payload .= file_get_contents( $filename );
                 $payload .= "\r\n";
+
+                $payload .= '--' . $boundary;
+                $payload .= "\r\n";
+                $payload .= 'Content-Disposition: form-data; name="' . $field_trimmed . '"' . "\r\n\r\n";
+                $payload .= $value;
+                $payload .= "\r\n";
             }
-            
-            $value = basename( $value );
         }
 
         // for non-file fields or file fields with missing file
