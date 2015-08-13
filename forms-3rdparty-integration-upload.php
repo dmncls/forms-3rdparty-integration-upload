@@ -82,7 +82,7 @@ function f3iup_check_for_file_uploads( $post, $service, $form, $submission ) {
 
 function get_mime_type( $filename ) {
     $finfo = new finfo(FILEINFO_MIME);
-    return $finfo->filename($filename);
+    return $finfo->file($filename);
 }
 
     
