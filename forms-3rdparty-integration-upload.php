@@ -63,6 +63,8 @@ function f3iup_check_for_file_uploads( $post, $service, $form, $submission ) {
                 $payload .= 'Content-Disposition: form-data; name="' . $field_trimmed . '"' . "\r\n\r\n";
                 $payload .= $value;
                 $payload .= "\r\n";
+                
+                continue;
             }
         }
 
