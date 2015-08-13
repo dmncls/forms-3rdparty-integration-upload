@@ -9,7 +9,7 @@
     1.1 - Initial version, works for CF7 and probably Ninja
 */
 
-include plugin_dir_path(__FILE__).'/../forms-3rdparty-integration/forms-3rdparty-integration.php';
+include_once plugin_dir_path(__FILE__).'/../forms-3rdparty-integration/forms-3rdparty-integration.php';
 
 add_filter( 'Forms3rdPartyIntegration_init', 'f3iup_init' );
 
